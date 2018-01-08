@@ -1,6 +1,7 @@
 import pandas as pd
 import numpy as np
 import itertools
+import pickle
 
 # read songs into pandas data frame
 songs = pd.read_csv('../data/songs.csv')
@@ -35,11 +36,21 @@ df.dropna(axis=0,inplace=True)
 
 # group by user and process groups
 for user, frame in df.groupby('msno'):
+    print(user)
     userGenres = frame['genre_ids'].values.tolist()
     userGenres = list(itertools.chain.from_iterable(userGenres))
     userGenres = set(list(userGenres))
+
+    for aGenre in userGenres:
+        m = genres.index(aGenre)
+        s[m] += 1
+
     combs = itertools.combinations(userGenres, 2)
     for comb in combs:
-        print(comb)
+        D[genres.index(comb[0]),genres.index(comb[1])] += 1
+        D[genres.index(comb[1]),genres.index(comb[0])] += 1
 
-print(df.head(5))
+# save everything as a pickle file
+pickle.dump(D,open('D.p','wb'))
+pickle.dump(genres,open('genres.p','wb'))
+pickle.dump(s,open('s.p','wb'))
